@@ -49,8 +49,6 @@ client.on('disconnected', (reason) => {
   clientStatus = 'disconnected';
 });
 
-client.initialize();
-
 // â”€â”€ Middleware Auth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function auth(req, res, next) {
   const token = req.headers['x-token'] || req.query.token;
@@ -132,7 +130,13 @@ app.post('/send', auth, async (req, res) => {
 });
 
 // â”€â”€ DÃ©marrage â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-app.listen(PORT, () => {
+// Important: Express dÃ©marre AVANT WhatsApp pour que Railway dÃ©tecte le port
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`ðŸš€ Serveur VALTEN WhatsApp dÃ©marrÃ© sur port ${PORT}`);
   console.log(`ðŸ“± QR Code: http://localhost:${PORT}/qr`);
+  // Initialiser WhatsApp aprÃ¨s que le serveur HTTP soit prÃªt
+  console.log('â³ Initialisation WhatsApp...');
+  client.initialize().catch(err => {
+    console.error('âŒ Erreur initialisation WhatsApp:', err.message);
+  });
 });
