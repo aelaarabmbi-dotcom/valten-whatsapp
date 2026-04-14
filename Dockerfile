@@ -1,21 +1,21 @@
-FROM node:18-bullseye-slim
+FROM node:18-alpine
 
-# Chromium + toutes les dÃ©pendances pour whatsapp-web.js / Puppeteer
-RUN apt-get update && apt-get install -y \
+# Chromium lÃ©ger sur Alpine â€” parfait pour Railway
+RUN apk add --no-cache \
     chromium \
-    chromium-sandbox \
-    fonts-freefont-ttf \
+    nss \
+    freetype \
+    harfbuzz \
     ca-certificates \
-    --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
+    ttf-freefont \
+    udev
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
-ENV CHROME_BIN=/usr/bin/chromium
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm install --production
 COPY . .
 
 EXPOSE 3000
